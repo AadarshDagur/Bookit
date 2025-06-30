@@ -44,11 +44,11 @@ app.use(passport.session());
 
 // Database connection
 const db = new pg.Client({
-    user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    database: process.env.DB_NAME || 'bookit',
-    password: process.env.DB_PASSWORD || 'adarsh@786',
-    port: parseInt(process.env.DB_PORT) || 5432,
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: parseInt(process.env.DB_PORT),
 });
 
 // Connect to database with error handling
@@ -512,7 +512,7 @@ process.on('SIGINT', async () => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on https://bookmyhotel-mo5b.onrender.com`);
 });
 
 export default app;
