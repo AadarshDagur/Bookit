@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Hotel - Admin Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Animated background elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-10px, -10px); }
+            50% { transform: translate(10px, -10px); }
+            75% { transform: translate(-10px, 10px); }
+        }
+
+        .create-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 440px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .create-header {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .create-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .create-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            position: relative;
+            z-index: 1;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .create-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .create-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .create-form {
+            padding: 40px 30px;
+            background: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .form-group input:focus {
+            border-color: #059669;
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .form-group input:focus + .input-icon {
+            color: #059669;
+        }
+
+        /* Price input special styling */
+        .price-input {
+            padding-left: 70px !important;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #059669;
+            font-weight: 700;
+            font-size: 1rem;
+            z-index: 2;
+        }
+
+        /* Phone input validation */
+        .phone-validation {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .phone-validation.show { opacity: 1; }
+        .phone-validation.valid { color: #059669; }
+        .phone-validation.invalid { color: #ef4444; }
+
+        .create-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .create-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(5, 150, 105, 0.4);
+        }
+
+        .create-btn:hover::before {
+            left: 100%;
+        }
+
+        .create-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .create-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+
+        
+
+        /* Success/Error message */
+        .message {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .success-message {
+            color: #059669;
+            background: rgba(5, 150, 105, 0.1);
+            border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .create-container {
+                margin: 10px;
+                border-radius: 20px;
+            }
+
+            .create-header {
+                padding: 30px 20px;
+            }
+
+            .create-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .create-form {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="create-container">
+        <div class="create-header">
+            <div class="create-icon">
+                🏨
+            </div>
+            <h1>Add New Hotel</h1>
+            <p>Register a new hotel in the system</p>
+        </div>
+
+        <div class="create-form">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="message error-message"><%= error %></div>
+            <% } %>
+            
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div class="message success-message"><%= success %></div>
+            <% } %>
+            
+            <form id="createHotelForm" action="/create" method="POST">
+                <div class="form-group">
+                    <label for="hotelName">Hotel Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="hotelName" name="hotelName" required placeholder="Enter hotel name" value="<%= typeof hotelName !== 'undefined' ? hotelName : '' %>">
+                        <div class="input-icon">🏨</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pricePerHour">Price Per Hour</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="pricePerHour" name="pricePerHour" required placeholder="0" min="1" step="0.01" class="price-input" value="<%= typeof pricePerHour !== 'undefined' ? pricePerHour : '' %>">
+                        <div class="input-icon">💰</div>
+                        <div class="currency-symbol">₹</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mobilePhone">Mobile Phone</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="mobilePhone" name="mobilePhone" required placeholder="Enter mobile number" pattern="[0-9]{10}" maxlength="10" value="<%= typeof mobilePhone !== 'undefined' ? mobilePhone : '' %>">
+                        <div class="input-icon">📱</div>
+                    </div>
+                    <div class="phone-validation" id="phoneValidation"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactPerson">Contact Person</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="contactPerson" name="contactPerson" required placeholder="Enter contact person name" value="<%= typeof contactPerson !== 'undefined' ? contactPerson : '' %>">
+                        <div class="input-icon">👤</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="create-btn" id="createBtn">
+                    <span>Add Hotel</span>
+                </button>
+            </form>
+
+            
+        </div>
+    </div>
+
+    <script>
+        // Phone number validation
+        function validatePhoneNumber(phone) {
+            const phoneRegex = /^[6-9]\d{9}$/; // Indian mobile number format
+            return phoneRegex.test(phone);
+        }
+
+        // Update button state
+        function updateButtonState() {
+            const hotelName = document.getElementById('hotelName').value.trim();
+            const pricePerHour = document.getElementById('pricePerHour').value;
+            const mobilePhone = document.getElementById('mobilePhone').value.trim();
+            const contactPerson = document.getElementById('contactPerson').value.trim();
+            const createBtn = document.getElementById('createBtn');
+
+            const isValid = hotelName && 
+                           pricePerHour && 
+                           parseFloat(pricePerHour) > 0 && 
+                           validatePhoneNumber(mobilePhone) && 
+                           contactPerson;
+            
+            createBtn.disabled = !isValid;
+        }
+
+        // Phone number input validation
+        document.getElementById('mobilePhone').addEventListener('input', function() {
+            const phone = this.value.replace(/\D/g, ''); // Remove non-digits
+            this.value = phone.slice(0, 10); // Limit to 10 digits
+            
+            const phoneValidation = document.getElementById('phoneValidation');
+            
+            if (phone.length > 0) {
+                phoneValidation.classList.add('show');
+                if (validatePhoneNumber(phone)) {
+                    phoneValidation.textContent = '✓ Valid mobile number';
+                    phoneValidation.className = 'phone-validation show valid';
+                } else {
+                    phoneValidation.textContent = '✗ Invalid mobile number format';
+                    phoneValidation.className = 'phone-validation show invalid';
+                }
+            } else {
+                phoneValidation.classList.remove('show');
+            }
+            
+            updateButtonState();
+        });
+
+        // Price validation
+        document.getElementById('pricePerHour').addEventListener('input', function() {
+            const price = parseFloat(this.value);
+            if (price < 0) {
+                this.value = '';
+            }
+            updateButtonState();
+        });
+
+        // Hotel name validation
+        document.getElementById('hotelName').addEventListener('input', function() {
+            this.value = this.value.replace(/^\s+/, ''); // Remove leading spaces
+            updateButtonState();
+        });
+
+        // Contact person validation
+        document.getElementById('contactPerson').addEventListener('input', function() {
+            this.value = this.value.replace(/^\s+/, ''); // Remove leading spaces
+            this.value = this.value.replace(/[^a-zA-Z\s]/g, ''); // Only letters and spaces
+            updateButtonState();
+        });
+
+        // Add floating animation to form inputs
+        document.querySelectorAll('.form-group input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Add ripple effect to buttons
+        document.querySelectorAll('.create-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (this.disabled) return;
+                
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255,255,255,0.3)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.pointerEvents = 'none';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            .create-btn {
+                position: relative;
+                overflow: hidden;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Form submission validation
+        document.getElementById('createHotelForm').addEventListener('submit', function(e) {
+            const hotelName = document.getElementById('hotelName').value.trim();
+            const pricePerHour = document.getElementById('pricePerHour').value;
+            const mobilePhone = document.getElementById('mobilePhone').value.trim();
+            const contactPerson = document.getElementById('contactPerson').value.trim();
+            
+            if (!hotelName) {
+                e.preventDefault();
+                alert('Please enter a hotel name!');
+                return;
+            }
+            
+            if (!pricePerHour || parseFloat(pricePerHour) <= 0) {
+                e.preventDefault();
+                alert('Please enter a valid price per hour!');
+                return;
+            }
+            
+            if (!validatePhoneNumber(mobilePhone)) {
+                e.preventDefault();
+                alert('Please enter a valid 10-digit mobile number!');
+                return;
+            }
+            
+            if (!contactPerson) {
+                e.preventDefault();
+                alert('Please enter a contact person name!');
+                return;
+            }
+        });
+
+        // Initialize button state
+        updateButtonState();
+    </script>
+</body>
+</html>

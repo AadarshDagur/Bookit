@@ -1,0 +1,192 @@
+<% const formatCurrency = val => `₹${parseFloat(val).toFixed(2)}`; %>
+<% const formatDateTime = dt => new Date(dt).toLocaleString('en-US', { hour12: false }); %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= settings.hotel_name %> Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/admin.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    .password-mismatch {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+    .error-message {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+    .password-match {
+      border-color: #28a745 !important;
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="header-section">
+      <div class="header-left">
+        <h1><%= settings.hotel_name %> <br>Admin Panel</h1>
+        <p>Smart Booking System Management Dashboard</p>
+      </div>
+      <div class="admin-controls">
+        <div class="admin-info">
+          <div class="admin-avatar">A</div>
+          <div>
+            <div style="font-weight: 600;"><%= settings.contact_person %></div>
+            <div style="font-size: 0.85rem; opacity: 0.8;">Super Administrator</div>
+          </div>
+        </div>
+        <a href="#" class="logout-btn" onclick="confirmLogout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <a href="/book" class="nav-tab"><i class="fas fa-calendar-plus"></i> Book Now</a>
+      <a href="/dashboard" class="nav-tab"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <a href="#" class="nav-tab active"><i class="fas fa-cog"></i> Admin</a>
+    </div>
+
+    <div class="admin-container">
+      <div class="admin-header">
+        <h2>System Administration</h2>
+        <p>Manage bookings, users, rooms, and system settings</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <% stats.forEach(stat => { %>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon <%= stat.class %>"><i class="<%= stat.icon %>"></i></div>
+          </div>
+          <div class="stat-value"><%= stat.value %></div>
+          <div class="stat-label"><%= stat.label %></div>
+        </div>
+        <% }) %>
+        
+
+        <!-- Revenue Comparison: This Week vs Last Week -->
+        <div class="stat-card revenue-comparison">
+          <div class="stat-header">
+            <div class="stat-icon revenue"><i class="fas fa-chart-line"></i></div>
+          </div>
+          <div class="stat-value"><%= revenueComparison.thisWeek %> vs <%= revenueComparison.lastWeek %></div>
+          <div class="stat-label">This Week vs Last Week</div>
+        </div>
+      </div>
+
+      <!-- Admin Settings Panel -->
+      <div class="admin-settings">
+        <h2>Admin Settings</h2>
+        <form method="POST" action="/admin/update-settings" onsubmit="return validateForm()">
+          <div class="form-group">
+            <label for="hotel_name">Hotel Name</label>
+            <input type="text" id="hotel_name" name="hotel_name" value="<%= settings.hotel_name %>" required />
+          </div>
+
+          <div class="form-group">
+            <label for="price_per_hour">Price per Hour (₹)</label>
+            <input type="number" id="price_per_hour" name="price_per_hour" step="0.01" value="<%= settings.price_per_hour %>" required />
+          </div>
+
+          <div class="form-group">
+            <label for="support_email">Support Email</label>
+            <input type="email" id="support_email" name="support_email" value="<%= settings.support_email %>" />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Admin Password</label>
+            <input type="password" id="password" name="password" value="<%= settings.password %>" oninput="checkPasswordMatch()">
+          </div>
+
+          <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter your password" oninput="checkPasswordMatch()">
+            <div class="error-message" id="password-error">Passwords do not match</div>
+          </div>
+
+          <div class="form-group">
+            <label for="support_phone">Support Phone</label>
+            <input type="tel" id="support_phone" name="support_phone" value="<%= settings.support_phone %>" />
+          </div>
+
+          <div class="form-group">
+            <label for="contact_person">Contact Person</label>
+            <input type="text" id="contact_person" name="contact_person" value="<%= settings.contact_person %>" />
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">Save Settings</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function confirmLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '/logout';
+      }
+    }
+
+    function checkPasswordMatch() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      const errorMessage = document.getElementById('password-error');
+      const confirmField = document.getElementById('confirm_password');
+      const submitBtn = document.getElementById('submit-btn');
+
+      // Reset styles
+      confirmField.classList.remove('password-mismatch', 'password-match');
+      errorMessage.style.display = 'none';
+
+      if (confirmPassword === '') {
+        // No styling when confirm field is empty
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        // Passwords don't match
+        confirmField.classList.add('password-mismatch');
+        errorMessage.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.6';
+        submitBtn.style.cursor = 'not-allowed';
+      } else {
+        // Passwords match
+        confirmField.classList.add('password-match');
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+      }
+    }
+
+    function validateForm() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match. Please ensure both password fields contain the same value.');
+        return false;
+      }
+
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long.');
+        return false;
+      }
+
+      return true;
+    }
+
+    // Initialize password check on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      checkPasswordMatch();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book Now - Smart Booking System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/booknow.css" />
+</head>
+<body>
+  <div class="main-container">
+    <div class="header-section">
+      <h1>Smart Booking System</h1>
+      <p>Intelligent scheduling with partition intervals algorithm for optimal time slot management</p>
+    </div>
+
+    <div class="nav-tabs">
+      <a href="#" class="nav-tab active"><i class="fas fa-calendar-plus"></i> Book Now</a>
+      <a href="/dashboard" class="nav-tab"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <a href="/admin" class="nav-tab"><i class="fas fa-cog"></i> Admin</a>
+    </div>
+
+    <div class="booking-container">
+      <div class="booking-header">
+        <h2>Book Your Perfect Space</h2>
+        <p>Smart room allocation will automatically select the best room based on availability</p>
+      </div>
+
+      <div class="booking-content">
+        <div class="booking-form">
+          <div class="status-message success" id="successMessage" style="display: none">
+            <i class="fas fa-check-circle"></i> Booking confirmed successfully!
+          </div>
+          <div class="status-message error" id="errorMessage" style="display: none">
+            <i class="fas fa-exclamation-circle"></i> Please fill in all required fields.
+          </div>
+
+          <form id="bookingForm">
+            <div class="form-section">
+              <h3><i class="fas fa-user"></i> Personal Information</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="user_name">Full Name *</label>
+                  <input type="text" id="user_name" name="user_name" required />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number *</label>
+                  <input type="tel" id="phone" name="phone" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email">Email Address *</label>
+                  <input type="email" id="email" name="email" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3><i class="fas fa-calendar-alt"></i> Date & Time</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="booking_date">Booking Date *</label>
+                  <input type="date" id="booking_date" name="booking_date" required />
+                </div>
+                <div class="form-group">
+                  <label for="start_time">Start Time *</label>
+                  <input type="time" id="start_time" name="start_time" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="duration">Duration (hours) *</label>
+                <select id="duration" name="duration" required>
+                  <option value="">Select Duration</option>
+                  <option value="1">1 Hour</option>
+                  <option value="2">2 Hours</option>
+                  <option value="3">3 Hours</option>
+                  <option value="4">4 Hours</option>
+                  <option value="8">Full Day (8 Hours)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3><i class="fas fa-info-circle"></i> Additional Information</h3>
+              <div class="form-group">
+                <label for="purpose">Purpose of Booking</label>
+                <input type="text" id="purpose" name="purpose" />
+              </div>
+            </div>
+
+            <div class="submit-section">
+              <button type="button" class="submit-btn" onclick="reviewBooking()">
+                <i class="fas fa-eye"></i> Save and Review
+              </button>
+            </div>
+          </form>
+
+          <form id="finalForm" method="POST" action="/book" style="display:none">
+            <input type="hidden" name="user_name" id="final_user_name">
+            <input type="hidden" name="email" id="final_email">
+            <input type="hidden" name="phone" id="final_phone">
+            <input type="hidden" name="booking_date" id="final_booking_date">
+            <input type="hidden" name="start_time" id="final_start_time">
+            <input type="hidden" name="duration" id="final_duration">
+            <input type="hidden" name="purpose" id="final_purpose">
+            <div class="submit-section">
+              <button type="submit" class="submit-btn final-book-btn">
+                <i class="fas fa-paper-plane"></i> Book Now
+              </button>
+              <button type="button" class="submit-btn edit-btn" onclick="editBooking()">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="booking-summary">
+          <div class="summary-header">
+            <h3>Booking Summary</h3>
+            <p>Room will be allocated automatically upon submission</p>
+          </div>
+
+          <div class="summary-item"><span class="summary-label">Name:</span> <span id="summaryName">-</span></div>
+          <div class="summary-item"><span class="summary-label">Email:</span> <span id="summaryEmail">-</span></div>
+          <div class="summary-item"><span class="summary-label">Phone:</span> <span id="summaryPhone">-</span></div>
+          <div class="summary-item"><span class="summary-label">Date:</span> <span id="summaryDate">-</span></div>
+          <div class="summary-item"><span class="summary-label">Time:</span> <span id="summaryTime">-</span></div>
+          <div class="summary-item"><span class="summary-label">Duration:</span> <span id="summaryDuration">-</span></div>
+          <div class="summary-item"><span class="summary-label">Purpose:</span> <span id="summaryPurpose">-</span></div>
+          <div class="summary-item"><span class="summary-label">Estimated Cost:</span> <span id="summaryCost">-</span></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function reviewBooking() {
+        const userName = document.getElementById('user_name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const bookingDate = document.getElementById('booking_date').value;
+        const startTime = document.getElementById('start_time').value;
+        const duration = document.getElementById('duration').value;
+        const purpose = document.getElementById('purpose').value;
+
+        if (!userName || !email || !phone || !bookingDate || !startTime || !duration) {
+            document.getElementById('errorMessage').textContent = 'Please fill in all required fields.';
+          document.getElementById('errorMessage').style.display = 'block';
+          return;
+        }
+
+        document.getElementById('errorMessage').style.display = 'none';
+
+        // Update summary
+        document.getElementById('summaryName').textContent = userName;
+        document.getElementById('summaryEmail').textContent = email;
+        document.getElementById('summaryPhone').textContent = phone;
+        document.getElementById('summaryDate').textContent = bookingDate;
+        document.getElementById('summaryTime').textContent = startTime;
+        document.getElementById('summaryDuration').textContent = duration + ' Hour(s)';
+        document.getElementById('summaryPurpose').textContent = purpose || 'N/A';
+
+        const cost = duration * 50;
+        document.getElementById('summaryCost').textContent = '$' + cost.toFixed(2);
+
+        // Fill final form
+        document.getElementById('final_user_name').value = userName;
+        document.getElementById('final_email').value = email;
+        document.getElementById('final_phone').value = phone;
+        document.getElementById('final_booking_date').value = bookingDate;
+        document.getElementById('final_start_time').value = startTime;
+        document.getElementById('final_duration').value = duration;
+        document.getElementById('final_purpose').value = purpose;
+
+        // Toggle forms
+        document.getElementById('bookingForm').style.display = 'none';
+        document.getElementById('finalForm').style.display = 'block';
+      }
+
+      function editBooking() {
+        document.getElementById('bookingForm').style.display = 'block';
+        document.getElementById('finalForm').style.display = 'none';
+      }
+    </script>
+  </div>
+</body>
+</html>
