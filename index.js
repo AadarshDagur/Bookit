@@ -81,7 +81,7 @@ app.set('views', path.join(__dirname, 'views'));
 // GET Routes
 
 app.get('/', (req, res) => {
-  res.prependListener('home.ejs');
+  res.render('home.ejs');
 });
 
 app.get('/login', (req, res) => {
