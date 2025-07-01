@@ -29,9 +29,9 @@ env.config();
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'mysecretkey', // Use environment variable in production
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false, // Changed to false for security
+  saveUninitialized: false,
   cookie: {
     secure: false, // Set to true in production with HTTPS
     maxAge: 30 * 60 * 1000 // 30 minutes session timeout
@@ -49,6 +49,9 @@ const db = new pg.Client({
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
     port: parseInt(process.env.DB_PORT),
+    ssl: { 
+      rejectUnauthorized: false 
+    }
 });
 
 // Connect to database with error handling
@@ -60,7 +63,7 @@ try {
   process.exit(1);
 }
 
-// Global error variable (consider using flash messages instead)
+// Global error variable
 let error = null;
 
 // Authentication middleware
@@ -75,14 +78,10 @@ function isAuthenticated(req, res, next) {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Routes
+// GET Routes
 
 app.get('/', (req, res) => {
-  if (req.isAuthenticated() && req.session.hotel_id) {
-    res.redirect('/admin');
-  } else {
-    res.redirect('/login');
-  }
+  res.prependListener('home.ejs');
 });
 
 app.get('/login', (req, res) => {
@@ -134,6 +133,8 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
       date: row.date_time.toISOString().split('T')[0],
       status: row.status,
     }));
+
+    // Calculate statistics
     
     const stats = {
       total: bookings.length,
@@ -152,7 +153,7 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
 });
 
 app.get('/book', isAuthenticated, (req, res) => {
-  res.render("booknow.ejs");
+  res.render("book.ejs");
 });
 
 
@@ -177,8 +178,7 @@ app.get('/admin', isAuthenticated, async (req, res) => {
     
     const stats = [
       { icon: "fas fa-calendar-check", label: "Total Bookings", value: bookings.length, class: "bookings" },
-      { icon: "fas fa-dollar-sign", label: "Monthly Revenue", value: `$${totalRevenue.toFixed(2)}`, class: "revenue" },
-      { icon: "fas fa-door-open", label: "Room Utilization", value: "85%", class: "rooms" }
+      { icon: "fas fa-dollar-sign", label: "Monthly Revenue", value: `$${totalRevenue.toFixed(2)}`, class: "revenue" }
     ];
     
     const [thisWeekResult, lastWeekResult] = await Promise.all([
@@ -221,12 +221,13 @@ app.get('/logout', (req, res) => {
       }
       
       res.clearCookie('connect.sid'); // Clear session cookie
-      res.redirect('/login');
+      res.redirect('/');
     });
   });
 });
 
 
+// POST Routes
 
 app.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
@@ -382,16 +383,19 @@ app.post('/book', isAuthenticated, async (req, res) => {
       ...Array.from({ length: 10 }, (_, i) => `Room ${301 + i}`)
     ];
     
+    // Get all bookings for the hotel on the selected date
     const result = await db.query(BOOKINGS.GET_OCCUPIED_ROOMS_ON_DATE, [hotelId, booking_date]);
     const roomBookings = {};
     rooms.forEach(r => roomBookings[r] = []);
     
+    // Populate room bookings with existing reservations
     result.rows.forEach(row => {
       const s = new Date(row.date_time);
       const e = new Date(s.getTime() + row.duration * 60 * 60 * 1000);
       roomBookings[row.room].push([s, e]);
     });
-    
+
+    // Check for conflicts in room bookings
     let assignedRoom = null;
     for (const room of rooms) {
       const conflicts = roomBookings[room].some(([bs, be]) => start < be && bs < end);
@@ -401,6 +405,7 @@ app.post('/book', isAuthenticated, async (req, res) => {
       }
     }
     
+    // If no room is available, return a conflict error
     if (!assignedRoom) {
       return res.status(409).send('No rooms available for the selected time slot.');
     }

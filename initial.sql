@@ -1,3 +1,5 @@
+--Run these queries to set up the database schema for the BookIt application.
+
 CREATE TABLE hotels (
   id SERIAL PRIMARY KEY,
   hotel_name VARCHAR(100),
@@ -14,7 +16,7 @@ CREATE TABLE bookings (
   email VARCHAR(100) NOT NULL,
   phone VARCHAR(20),
   room VARCHAR(20) NOT NULL,
-  booking_date DATE NOT NULL,
+  date_only DATE NOT NULL,
   date_time TIMESTAMP NOT NULL, -- start datetime
   duration INTEGER NOT NULL,    -- in hours
   total NUMERIC(10, 2) NOT NULL,

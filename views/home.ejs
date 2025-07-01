@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Booking System - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/home.css">
+</head>
+<body>
+    <!-- Floating Elements -->
+    <div class="floating-element">
+        <i class="fas fa-calendar-alt" style="font-size: 3rem;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-clock" style="font-size: 2.5rem;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-door-open" style="font-size: 3.5rem;"></i>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">BookIt<br>Smart Booking System</h1>
+            <p class="hero-subtitle">Zero Overlap, Full Occupancy</p>
+            <p class="hero-description">
+                Experience the future of room booking with our intelligence. 
+                Our system ensures optimal resource utilization while eliminating booking conflicts entirely.
+            </p>
+            <div class="cta-buttons">
+                <a class="cta-button cta-primary" href="/login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </a>
+                <a class="cta-button cta-secondary" href="/register">
+                    <i class="fas fa-user-plus"></i>
+                    Register
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-container">
+            <div class="features-header">
+                <h2>Why Choose Our System?</h2>
+                <p>Advanced algorithms meet intuitive design for seamless booking management</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Intelligent Scheduling</h3>
+                    <p class="feature-description">
+                        Our advanced interval partitioning algorithm automatically prevents booking conflicts 
+                        and maximizes room utilization efficiency.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Zero Overlap Guarantee</h3>
+                    <p class="feature-description">
+                        Mathematical precision ensures no double bookings. Every reservation is validated 
+                        against existing schedules in real-time.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Real-time Analytics</h3>
+                    <p class="feature-description">
+                        Comprehensive dashboard with live booking statistics, monthly & weekly revenue details etc.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Responsive Design</h3>
+                    <p class="feature-description">
+                        Access your booking system from any device. Our responsive interface adapts 
+                        perfectly to desktop, tablet, and mobile screens.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <h3 class="feature-title">Admin Control</h3>
+                    <p class="feature-description">
+                        Powerful administrative tools for managing bookings, users, and system settings 
+                        with granular permission controls.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">Secure Authentication</h3>
+                    <p class="feature-description">
+                        Multi-layered security with bcrypt password hashing and Google OAuth integration 
+                        for safe, convenient access to your booking system.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <h2 class="about-title">About the Project</h2>
+            <div class="about-content">
+                <p>
+                    BookIt, a full-stack web application is a smart booking system that redefines
+                    resource scheduling through intelligent automation.
+                
+                </p>
+                <p>
+
+                    At its core lies a conflict-free interval partitioning algorithm, which
+                     intelligently assigns rooms to bookings without overlaps, guaranteeing efficient 
+                     room utilization. The booking logic mirrors real-world scheduling challenges and 
+                     applies greedy algorithms to solve them with precision.
+
+                </p>
+                <p>
+                    The platform is designed for scalability, responsive performance, and intuitive UX — making
+                     it adaptable for small hotels, co-working spaces, or enterprise-level resource management. 
+                     Hosted on Render with persistent PostgreSQL support, it offers seamless deployment and 
+                     production-readiness.
+                </p>
+            </div>
+            <div class="tech-stack">
+                <div class="tech-item">Node.js</div>
+                <div class="tech-item">Express.js</div>
+                <div class="tech-item">Secure Authentication</div>
+                <div class="tech-item">Modern CSS</div>
+                <div class="tech-item">JavaScript ES6+</div>
+                <div class="tech-item">Responsive Design</div>
+            </div>
+        </div>
+    </section>
+    <footer>
+      <p>Made with ❤️ by Adarsh &copy; 2025</p>
+    </footer>
+
+    
+
+    <script>
+        
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                }
+            });
+        }, observerOptions);
+
+        // Observe feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

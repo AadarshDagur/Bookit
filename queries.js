@@ -1,4 +1,4 @@
-// queries.js
+// These are the SQL queries used in the BookIt application for managing hotels and bookings.
 export const HOTEL = {
   GET_BY_EMAIL_AND_PASSWORD: `
     SELECT * FROM hotels WHERE support_email = $1 AND password = $2
