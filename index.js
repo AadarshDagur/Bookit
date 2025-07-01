@@ -517,7 +517,7 @@ process.on('SIGINT', async () => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on https://bookmyhotel-mo5b.onrender.com`);
+  console.log(`Server is running on https://bookit-f8ox.onrender.com`);
 });
 
 export default app;

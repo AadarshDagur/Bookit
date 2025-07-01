@@ -47,7 +47,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID ,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ,
-      callbackURL: "https://bookmyhotel-mo5b.onrender.com/auth/google/profile",
+      callbackURL: "https://bookit-f8ox.onrender.com/auth/google/profile",
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     },
     async (accessToken, refreshToken, profile, cb) => {
