@@ -55,7 +55,7 @@ start < existing_end && existing_start < end
 ## 💻 Setup
 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/bookit.git
+git clone https://github.com/AadarshDagur/bookit.git
 ```
 
 ```bash
